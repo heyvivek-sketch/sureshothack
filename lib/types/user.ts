@@ -3,6 +3,8 @@ export interface User {
   email: string;
   fullName: string;
   password: string; // Hashed password
+  isPremium?: boolean;
+  isVip?: boolean;
   createdAt: Date;
 }
 
@@ -25,6 +27,9 @@ export interface AuthResponse {
     id: string;
     email: string;
     fullName: string;
+    isPremium?: boolean;
+    isVip?: boolean;
+    createdAt?: Date | string;
   };
 }
 

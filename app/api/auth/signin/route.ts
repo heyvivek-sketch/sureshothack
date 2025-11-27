@@ -20,9 +20,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find user
-    const user = await findUserByEmail(body.email);
+    // Normalize email for search
+    const normalizedEmail = body.email.toLowerCase().trim();
+
+    // Find user by email (case-insensitive)
+    const user = await findUserByEmail(normalizedEmail);
     if (!user) {
+      // Don't reveal if email exists or not (security best practice)
       return NextResponse.json(
         {
           success: false,
@@ -50,6 +54,7 @@ export async function POST(request: NextRequest) {
       email: user.email,
     });
 
+    // Return user data with VIP/Premium status
     return NextResponse.json({
       success: true,
       message: 'Login successful',
@@ -58,9 +63,13 @@ export async function POST(request: NextRequest) {
         id: user.id,
         email: user.email,
         fullName: user.fullName,
+        isPremium: user.isPremium ?? false,
+        isVip: user.isVip ?? false,
+        createdAt: user.createdAt,
       },
     });
   } catch (error) {
+    console.error('Signin error:', error);
     if (error instanceof Error) {
       return NextResponse.json(
         {

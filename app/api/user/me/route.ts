@@ -19,9 +19,14 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Return user with VIP/Premium status
     return NextResponse.json({
       success: true,
-      user,
+      user: {
+        ...user,
+        isPremium: user.isPremium ?? false,
+        isVip: user.isVip ?? false,
+      },
     });
   } catch (error) {
     if (error instanceof Error && error.message === 'Unauthorized') {

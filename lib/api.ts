@@ -6,11 +6,7 @@ export interface ApiResponse<T = any> {
   message: string;
   data?: T;
   token?: string;
-  user?: {
-    id: string;
-    email: string;
-    fullName: string;
-  };
+  user?: User;
 }
 
 export interface SignupData {
@@ -28,6 +24,8 @@ export interface User {
   id: string;
   email: string;
   fullName: string;
+  isPremium?: boolean;
+  isVip?: boolean;
   createdAt?: string;
 }
 
@@ -104,6 +102,13 @@ class ApiClient {
 
   async getCurrentUser(): Promise<ApiResponse<User>> {
     return this.request('/api/user/me');
+  }
+
+  async updateVipStatus(data: { isVip: boolean; isPremium?: boolean }): Promise<ApiResponse<User>> {
+    return this.request('/api/user/vip', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
   }
 }
 

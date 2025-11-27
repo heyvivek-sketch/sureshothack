@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create user
+    // Create user (VIP/Premium defaults to false)
     const user = await createUser(body);
 
     // Generate token
@@ -38,6 +38,9 @@ export async function POST(request: NextRequest) {
           id: user.id,
           email: user.email,
           fullName: user.fullName,
+          isPremium: user.isPremium ?? false,
+          isVip: user.isVip ?? false,
+          createdAt: user.createdAt,
         },
       },
       { status: 201 }

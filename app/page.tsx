@@ -1,33 +1,153 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Logo from "@/components/Logo";
 import { useAuth } from "@/context/AuthContext";
+import Script from "next/script";
+
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
 
 export default function LandingPage() {
   const { isAuthenticated, user, logout, isLoading } = useAuth();
-  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [razorpayLoaded, setRazorpayLoaded] = useState(false);
   const router = useRouter();
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, isLoading, router]);
 
   const handleLogout = async () => {
     await logout();
   };
 
-  const handleStartNow = () => {
-    // Redirect to signup if not authenticated
-    if (!isAuthenticated) {
+  const handleStartNow = async () => {
+    if (!isAuthenticated || !user) {
       router.push("/signup");
       return;
     }
-    // Show subscription modal if authenticated
-    setShowSubscriptionModal(true);
+
+    if (!razorpayLoaded || !window.Razorpay) {
+      alert("Payment gateway is loading. Please wait a moment and try again.");
+      return;
+    }
+
+    setIsProcessingPayment(true);
+
+    try {
+      // Create order on backend
+      const response = await fetch("/api/payments/create-order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: 65500, // ₹655 in paise
+          currency: "INR",
+        }),
+      });
+
+      const orderData = await response.json();
+
+      if (!orderData.success || !orderData.order) {
+        throw new Error(orderData.message || "Failed to create order");
+      }
+
+      const razorpayKeyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+      if (!razorpayKeyId) {
+        throw new Error("Razorpay key is not configured");
+      }
+
+      // Initialize Razorpay checkout
+      const options = {
+        key: razorpayKeyId,
+        amount: orderData.order.amount,
+        currency: orderData.order.currency,
+        name: "SureShot_Hack",
+        description: "VIP Subscription - 28 Days",
+        order_id: orderData.order.id,
+        handler: async function (response: any) {
+          // Verify payment on backend
+          try {
+            const verifyResponse = await fetch("/api/payments/verify", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
+
+            const verifyData = await verifyResponse.json();
+
+            if (verifyData.success) {
+              alert("Payment successful! Your VIP subscription is now active.");
+              // Refresh page or update user status
+              window.location.reload();
+            } else {
+              alert("Payment verification failed. Please contact support.");
+            }
+          } catch (error) {
+            console.error("Payment verification error:", error);
+            alert("Payment verification failed. Please contact support.");
+          }
+        },
+        prefill: {
+          name: user.fullName || "",
+          email: user.email || "",
+        },
+        theme: {
+          color: "#FF6B35",
+        },
+        modal: {
+          ondismiss: function () {
+            setIsProcessingPayment(false);
+          },
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+      razorpay.on("payment.failed", function (response: any) {
+        alert("Payment failed. Please try again.");
+        setIsProcessingPayment(false);
+      });
+    } catch (error) {
+      console.error("Payment error:", error);
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Failed to initiate payment. Please try again."
+      );
+      setIsProcessingPayment(false);
+    }
   };
 
-  const handleCloseModal = () => {
-    setShowSubscriptionModal(false);
-  };
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    );
+  }
+
+  // Don't render content if not authenticated (will redirect)
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
@@ -97,9 +217,15 @@ export default function LandingPage() {
 
             {/* VIP Status */}
             <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-white mb-2">
-                YOU&apos;RE NOT VIP ★
-              </h2>
+              {user?.isPremium || user?.isVip ? (
+                <h2 className="text-2xl font-bold text-white mb-2">
+                  YOU&apos;RE VIP ★
+                </h2>
+              ) : (
+                <h2 className="text-2xl font-bold text-white mb-2">
+                  YOU&apos;RE NOT VIP 😢
+                </h2>
+              )}
               <p className="text-lg font-semibold text-white mb-6">CLICK TO START</p>
             </div>
 
@@ -107,9 +233,10 @@ export default function LandingPage() {
             <div className="flex justify-center mb-8">
               <button
                 onClick={handleStartNow}
-                className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 rounded-full text-white font-bold text-base transition-all shadow-lg shadow-red-600/50"
+                disabled={isProcessingPayment}
+                className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 rounded-full text-white font-bold text-base transition-all shadow-lg shadow-red-600/50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                START NOW
+                {isProcessingPayment ? "Processing..." : "START NOW"}
               </button>
             </div>
 
@@ -178,52 +305,18 @@ export default function LandingPage() {
         </div>
       </main>
 
-      {/* Subscription Modal */}
-      {showSubscriptionModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-3xl shadow-2xl border border-gray-700/30 backdrop-blur-sm bg-gradient-to-br from-gray-900/95 via-gray-800/90 to-gray-900/95 relative overflow-hidden">
-            {/* Inner glow effect */}
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-cyan-500/5 rounded-3xl pointer-events-none"></div>
-            
-            <div className="relative z-10 p-8">
-              {/* Title */}
-              <h2 className="text-2xl font-bold text-white text-center mb-6 uppercase tracking-wide">
-                SUBSCRIBE TO UNLOCK THE HACK
-              </h2>
-
-              {/* Price */}
-              <div className="text-center mb-8">
-                <span className="text-6xl font-bold text-yellow-400">₹655</span>
-              </div>
-
-              {/* Payment Buttons */}
-              <div className="space-y-4 mb-6">
-                <button className="w-full px-5 py-3 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 rounded-full text-white font-semibold text-sm transition-all shadow-lg shadow-red-600/30">
-                  Pay With PayU
-                </button>
-                <button className="w-full px-5 py-3 bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 rounded-full text-white font-semibold text-sm transition-all shadow-lg shadow-blue-500/30">
-                  Pay Via UPI
-                </button>
-              </div>
-
-              {/* Validity */}
-              <div className="text-center mb-6">
-                <p className="text-white text-sm">28 Days Validity</p>
-              </div>
-
-              {/* Close Button */}
-              <div className="flex justify-center">
-                <button
-                  onClick={handleCloseModal}
-                  className="px-6 py-2.5 bg-primary-dark-gray hover:bg-primary-light-gray rounded-full text-white font-medium text-sm transition-all"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Razorpay Script */}
+      <Script
+        id="razorpay-checkout-js"
+        src="https://checkout.razorpay.com/v1/checkout.js"
+        strategy="lazyOnload"
+        onLoad={() => {
+          setRazorpayLoaded(true);
+        }}
+        onError={() => {
+          console.error("Failed to load Razorpay script");
+        }}
+      />
     </div>
   );
 }
