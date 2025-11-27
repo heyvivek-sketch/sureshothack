@@ -6,11 +6,7 @@ export interface ApiResponse<T = any> {
   message: string;
   data?: T;
   token?: string;
-  user?: {
-    id: string;
-    email: string;
-    fullName: string;
-  };
+  user?: User;
 }
 
 export interface SignupData {
@@ -28,6 +24,9 @@ export interface User {
   id: string;
   email: string;
   fullName: string;
+  isPremium?: boolean;
+  isVip?: boolean;
+  vipExpiresAt?: string | null;
   createdAt?: string;
 }
 
@@ -104,6 +103,31 @@ class ApiClient {
 
   async getCurrentUser(): Promise<ApiResponse<User>> {
     return this.request('/api/user/me');
+  }
+
+  async updateVipStatus(data: { isVip: boolean; isPremium?: boolean }): Promise<ApiResponse<User>> {
+    return this.request('/api/user/vip', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async createPaymentOrder(amount: number, currency: string = 'INR'): Promise<ApiResponse & { order?: { id: string; amount: number; currency: string; receipt: string } }> {
+    return this.request('/api/payments/create-order', {
+      method: 'POST',
+      body: JSON.stringify({ amount, currency }),
+    }) as Promise<ApiResponse & { order?: { id: string; amount: number; currency: string; receipt: string } }>;
+  }
+
+  async verifyPayment(paymentData: {
+    razorpay_order_id: string;
+    razorpay_payment_id: string;
+    razorpay_signature: string;
+  }): Promise<ApiResponse & { payment?: { orderId: string; paymentId: string }; user?: User }> {
+    return this.request('/api/payments/verify', {
+      method: 'POST',
+      body: JSON.stringify(paymentData),
+    }) as Promise<ApiResponse & { payment?: { orderId: string; paymentId: string }; user?: User }>;
   }
 }
 

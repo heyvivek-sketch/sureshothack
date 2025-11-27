@@ -3,7 +3,11 @@ export interface User {
   email: string;
   fullName: string;
   password: string; // Hashed password
+  isPremium?: boolean;
+  isVip?: boolean;
+  vipExpiresAt?: Date | null; // VIP subscription expiry date
   createdAt: Date;
+  updatedAt?: Date;
 }
 
 export interface CreateUserInput {
@@ -25,6 +29,10 @@ export interface AuthResponse {
     id: string;
     email: string;
     fullName: string;
+    isPremium?: boolean;
+    isVip?: boolean;
+    vipExpiresAt?: Date | string | null;
+    createdAt?: Date | string;
   };
 }
 
