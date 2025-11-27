@@ -2,18 +2,26 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Logo from "@/components/Logo";
 import { useAuth } from "@/context/AuthContext";
 
 export default function LandingPage() {
   const { isAuthenticated, user, logout, isLoading } = useAuth();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const router = useRouter();
 
   const handleLogout = async () => {
     await logout();
   };
 
   const handleStartNow = () => {
+    // Redirect to signup if not authenticated
+    if (!isAuthenticated) {
+      router.push("/signup");
+      return;
+    }
+    // Show subscription modal if authenticated
     setShowSubscriptionModal(true);
   };
 
