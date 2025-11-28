@@ -288,7 +288,7 @@ export default function LandingPage() {
             </div>
 
             {/* Start Now Button - Shows payment flow for non-VIP, starts game for VIP */}
-            <div className={`flex justify-center ${gameStarted ? 'mb-4 sm:mb-2 md:mb-3' : 'mb-6 sm:mb-4 md:mb-5'}`}>
+            <div className={`flex flex-col items-center ${gameStarted ? 'mb-4 sm:mb-2 md:mb-3' : 'mb-6 sm:mb-4 md:mb-5'}`}>
               <button
                 onClick={handleStartNow}
                 disabled={isProcessingPayment}
@@ -296,6 +296,7 @@ export default function LandingPage() {
               >
                 {isProcessingPayment ? "Processing..." : "START NOW"}
               </button>
+              <p className="text-white font-serif text-sm sm:text-xs mt-2">vivekvishvkarma@yesg</p>
             </div>
 
             {/* Game Result - Show random number icon after game started (VIP only) */}
