@@ -190,7 +190,7 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
+    <div className="h-screen overflow-hidden bg-gradient-to-br from-black via-gray-900 to-black relative">
       {/* Background glows */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-96 h-96 bg-orange-500/20 rounded-full blur-3xl"></div>
@@ -230,15 +230,15 @@ export default function LandingPage() {
       </header>
 
       {/* Main Content */}
-      <main className="relative z-10 flex items-center justify-center min-h-[calc(100vh-80px)] sm:min-h-screen px-4 sm:px-4 overflow-x-hidden pb-4">
-        <div className="w-full h-auto sm:h-auto sm:max-w-2xl rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-[0_0_30px_rgba(59,130,246,0.3),0_0_60px_rgba(59,130,246,0.2)] border border-gray-700/30 backdrop-blur-sm bg-gradient-to-br from-gray-900/90 via-gray-800/80 to-gray-900/90 relative overflow-hidden flex flex-col justify-center">
+      <main className="relative z-10 flex items-center justify-center h-[calc(100vh-80px)] sm:h-[calc(100vh-96px)] px-4 sm:px-4 overflow-hidden">
+        <div className="w-full h-auto sm:h-auto sm:max-w-lg rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-[0_0_30px_rgba(59,130,246,0.3),0_0_60px_rgba(59,130,246,0.2)] border border-gray-700/30 backdrop-blur-sm bg-gradient-to-br from-gray-900/90 via-gray-800/80 to-gray-900/90 relative overflow-hidden flex flex-col justify-center">
           {/* Inner glow effect */}
           <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-cyan-500/5 rounded-2xl sm:rounded-3xl pointer-events-none"></div>
           
           <div className="relative z-10 flex flex-col justify-center">
             {/* Select Game Button - At the top */}
             {!gameStarted && (
-              <div className="flex justify-center mb-8 sm:mb-6">
+              <div className="flex justify-center mb-6 sm:mb-4">
                 <GameSelector 
                   selectedGame={selectedGame} 
                   onGameChange={setSelectedGame} 
@@ -247,18 +247,18 @@ export default function LandingPage() {
             )}
 
             {/* VIP Status */}
-            <div className="text-center mb-6 sm:mb-6">
+            <div className="text-center mb-5 sm:mb-4">
               {isVip ? (
-                <h2 className="text-3xl sm:text-4xl font-serif font-bold text-white mb-3">
+                <h2 className="text-2xl sm:text-3xl font-serif font-bold text-white mb-2">
                   YOU&apos;RE VIP USER ★
                 </h2>
               ) : (
-                <h2 className="text-3xl sm:text-4xl font-serif font-bold text-white mb-3">
+                <h2 className="text-2xl sm:text-3xl font-serif font-bold text-white mb-2">
                   YOU&apos;RE NOT VIP ★
                 </h2>
               )}
               {!gameStarted && (
-                <p className="text-xl sm:text-2xl font-serif font-semibold text-white mb-6 sm:mb-6">CLICK TO START</p>
+                <p className="text-lg sm:text-xl font-serif font-semibold text-white mb-5 sm:mb-4">CLICK TO START</p>
               )}
             </div>
 
@@ -272,11 +272,11 @@ export default function LandingPage() {
 
             {/* Become VIP Button - Show for non-VIP users */}
             {!isVip && (
-              <div className="flex justify-center mb-4 sm:mb-4">
+              <div className="flex justify-center mb-3 sm:mb-3">
                 <button
                   onClick={handleBecomeVip}
                   disabled={isProcessingPayment}
-                  className="px-6 py-3 sm:px-6 sm:py-3 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 rounded-full text-white font-bold text-base sm:text-base transition-all shadow-lg shadow-purple-600/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-5 py-2.5 sm:px-5 sm:py-2.5 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 rounded-full text-white font-bold text-sm sm:text-sm transition-all shadow-lg shadow-purple-600/50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isProcessingPayment ? "Processing..." : "BECOME VIP"}
                 </button>
@@ -284,11 +284,11 @@ export default function LandingPage() {
             )}
 
             {/* Start Now Button */}
-            <div className="flex justify-center mb-6 sm:mb-8">
+            <div className="flex justify-center mb-5 sm:mb-6">
               <button
                 onClick={handleStartNow}
                 disabled={isProcessingPayment || gameStarted}
-                className="px-8 py-4 sm:px-8 sm:py-4 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 rounded-full text-white font-bold text-base sm:text-lg transition-all shadow-lg shadow-red-600/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-3 sm:px-6 sm:py-3 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 rounded-full text-white font-bold text-sm sm:text-base transition-all shadow-lg shadow-red-600/50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isProcessingPayment
                   ? "Processing..."
@@ -301,7 +301,7 @@ export default function LandingPage() {
           </div>
 
           {/* Social Media Icons */}
-          <div className="flex justify-center gap-3 sm:gap-4 mt-6 sm:mt-8">
+          <div className="flex justify-center gap-3 sm:gap-4 mt-4 sm:mt-6">
             <a
               href="#"
               className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500 rounded-full flex items-center justify-center hover:bg-green-600 transition-colors"
