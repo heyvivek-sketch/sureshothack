@@ -53,7 +53,7 @@ export default function GameSelector({ selectedGame, onGameChange }: GameSelecto
     <div className="relative w-full flex justify-center">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-auto max-w-[280px] bg-blue-400 hover:bg-blue-500 rounded-full px-5 py-3 flex items-center justify-between text-white font-medium shadow-md hover:shadow-lg transition-all text-base min-w-0"
+        className="w-auto max-w-[240px] sm:max-w-[220px] bg-blue-400 hover:bg-blue-500 rounded-full px-4 py-2.5 sm:px-4 sm:py-2 flex items-center justify-between text-white font-medium shadow-md hover:shadow-lg transition-all text-sm sm:text-sm min-w-0"
       >
         <div className="flex items-center gap-2">
           <svg
