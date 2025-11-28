@@ -17,12 +17,14 @@ import type {
   RazorpayPaymentResponse,
 } from "@/lib/types/razorpay";
 import GameInterface from "@/components/game/GameInterface";
+import GameSelector from "@/components/game/GameSelector";
 
 export default function LandingPage() {
   const { isAuthenticated, user, logout, isLoading, checkAuth } = useAuth();
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
+  const [selectedGame, setSelectedGame] = useState<string>("");
   const router = useRouter();
 
   const isVip = user?.isVip || user?.isPremium;
@@ -195,23 +197,23 @@ export default function LandingPage() {
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl"></div>
       </div>
 
-      {/* Header */}
-      <header className="relative z-10 flex items-center justify-between p-6">
-        <Link href="/" className="flex items-center gap-3">
+      {/* Header - Visible on all screens */}
+      <header className="relative z-10 flex items-center justify-between p-3 sm:p-6">
+        <Link href="/" className="flex items-center gap-2 sm:gap-3">
           <Logo size="sm" showText={false} />
-          <h1 className="text-white text-xl font-bold">SureShot_Hack</h1>
+          <h1 className="text-white text-base sm:text-xl font-bold">SureShot_Hack</h1>
         </Link>
-        <div className="flex gap-3 items-center">
+        <div className="flex gap-2 sm:gap-3 items-center">
           {isLoading ? (
-            <div className="text-white">Loading...</div>
+            <div className="text-white text-sm">Loading...</div>
           ) : isAuthenticated ? (
             <>
-              <span className="text-white text-sm hidden sm:inline">
+              <span className="text-white text-xs sm:text-sm hidden sm:inline">
                 Welcome, {user?.fullName || user?.email}
               </span>
               <button
                 onClick={handleLogout}
-                className="px-6 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white font-medium transition-colors"
+                className="px-3 py-1.5 sm:px-6 sm:py-2 bg-blue-600 sm:bg-red-600 hover:bg-blue-700 sm:hover:bg-red-700 rounded-lg text-white text-xs sm:text-base font-medium transition-colors"
               >
                 Logout
               </button>
@@ -219,7 +221,7 @@ export default function LandingPage() {
           ) : (
             <Link
               href="/login"
-              className="px-6 py-2 bg-primary-dark-gray hover:bg-primary-light-gray rounded-lg text-white font-medium transition-colors"
+              className="px-3 py-1.5 sm:px-6 sm:py-2 bg-primary-dark-gray hover:bg-primary-light-gray rounded-lg text-white text-xs sm:text-base font-medium transition-colors"
             >
               Login
             </Link>
@@ -228,50 +230,35 @@ export default function LandingPage() {
       </header>
 
       {/* Main Content */}
-      <main className="relative z-10 flex items-center justify-center min-h-[calc(100vh-120px)] px-4 overflow-x-hidden">
-        <div className="w-full max-w-md rounded-3xl p-4 sm:p-8 shadow-2xl border border-gray-700/30 backdrop-blur-sm bg-gradient-to-br from-gray-900/90 via-gray-800/80 to-gray-900/90 relative overflow-hidden">
+      <main className="relative z-10 flex items-center justify-center min-h-[calc(100vh-80px)] sm:min-h-screen px-4 sm:px-4 overflow-x-hidden pb-4">
+        <div className="w-full h-auto sm:h-auto sm:max-w-2xl rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-[0_0_30px_rgba(59,130,246,0.3),0_0_60px_rgba(59,130,246,0.2)] border border-gray-700/30 backdrop-blur-sm bg-gradient-to-br from-gray-900/90 via-gray-800/80 to-gray-900/90 relative overflow-hidden flex flex-col justify-center">
           {/* Inner glow effect */}
-          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-cyan-500/5 rounded-3xl pointer-events-none"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-cyan-500/5 rounded-2xl sm:rounded-3xl pointer-events-none"></div>
           
-          <div className="relative z-10">
+          <div className="relative z-10 flex flex-col justify-center">
+            {/* Select Game Button - At the top */}
+            {!gameStarted && (
+              <div className="flex justify-center mb-8 sm:mb-6">
+                <GameSelector 
+                  selectedGame={selectedGame} 
+                  onGameChange={setSelectedGame} 
+                />
+              </div>
+            )}
+
             {/* VIP Status */}
-            <div className="text-center mb-6">
+            <div className="text-center mb-6 sm:mb-6">
               {isVip ? (
-                <>
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <span className="inline-block bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                      Online
-                    </span>
-                    <span className="text-white text-sm">
-                      {new Date().toLocaleTimeString()}
-                    </span>
-                  </div>
-                  <h2 className="text-2xl font-bold text-white mb-2">
-                    YOU&apos;RE VIP USER 💎
-                  </h2>
-                  {user?.vipExpiresAt && (
-                    <p className="text-sm text-gray-300 mb-2">
-                      Expires: {new Date(user.vipExpiresAt).toLocaleDateString()}
-                    </p>
-                  )}
-                </>
+                <h2 className="text-3xl sm:text-4xl font-serif font-bold text-white mb-3">
+                  YOU&apos;RE VIP USER ★
+                </h2>
               ) : (
-                <>
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <span className="inline-block bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                      Online
-                    </span>
-                    <span className="text-white text-sm">
-                      {new Date().toLocaleTimeString()}
-                    </span>
-                  </div>
-                  <h2 className="text-2xl font-bold text-yellow-400 mb-2">
-                    YOU&apos;RE NOT VIP 😔
-                  </h2>
-                </>
+                <h2 className="text-3xl sm:text-4xl font-serif font-bold text-white mb-3">
+                  YOU&apos;RE NOT VIP ★
+                </h2>
               )}
               {!gameStarted && (
-                <p className="text-lg font-semibold text-white mb-6">CLICK TO START</p>
+                <p className="text-xl sm:text-2xl font-serif font-semibold text-white mb-6 sm:mb-6">CLICK TO START</p>
               )}
             </div>
 
@@ -285,11 +272,11 @@ export default function LandingPage() {
 
             {/* Become VIP Button - Show for non-VIP users */}
             {!isVip && (
-              <div className="flex justify-center mb-4">
+              <div className="flex justify-center mb-4 sm:mb-4">
                 <button
                   onClick={handleBecomeVip}
                   disabled={isProcessingPayment}
-                  className="px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 rounded-full text-white font-bold text-base transition-all shadow-lg shadow-purple-600/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-6 py-3 sm:px-6 sm:py-3 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 rounded-full text-white font-bold text-base sm:text-base transition-all shadow-lg shadow-purple-600/50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isProcessingPayment ? "Processing..." : "BECOME VIP"}
                 </button>
@@ -297,11 +284,11 @@ export default function LandingPage() {
             )}
 
             {/* Start Now Button */}
-            <div className="flex justify-center mb-8">
+            <div className="flex justify-center mb-6 sm:mb-8">
               <button
                 onClick={handleStartNow}
                 disabled={isProcessingPayment || gameStarted}
-                className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 rounded-full text-white font-bold text-base transition-all shadow-lg shadow-red-600/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-8 py-4 sm:px-8 sm:py-4 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 rounded-full text-white font-bold text-base sm:text-lg transition-all shadow-lg shadow-red-600/50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isProcessingPayment
                   ? "Processing..."
@@ -314,10 +301,10 @@ export default function LandingPage() {
           </div>
 
           {/* Social Media Icons */}
-          <div className="flex justify-center gap-4 mt-8">
+          <div className="flex justify-center gap-3 sm:gap-4 mt-6 sm:mt-8">
             <a
               href="#"
-              className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center hover:bg-green-600 transition-colors"
+              className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500 rounded-full flex items-center justify-center hover:bg-green-600 transition-colors"
               aria-label="WhatsApp"
             >
               <svg
@@ -332,7 +319,7 @@ export default function LandingPage() {
             </a>
             <a
               href="#"
-              className="w-12 h-12 bg-blue-400 rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors"
+              className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-400 rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors"
               aria-label="Telegram"
             >
               <svg
@@ -347,7 +334,7 @@ export default function LandingPage() {
             </a>
             <a
               href="#"
-              className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center hover:bg-red-700 transition-colors"
+              className="w-10 h-10 sm:w-12 sm:h-12 bg-red-600 rounded-full flex items-center justify-center hover:bg-red-700 transition-colors"
               aria-label="YouTube"
             >
               <svg

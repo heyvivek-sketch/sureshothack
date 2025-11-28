@@ -50,17 +50,29 @@ export default function GameSelector({ selectedGame, onGameChange }: GameSelecto
   }
 
   return (
-    <div className="relative w-full overflow-hidden">
+    <div className="relative w-full flex justify-center">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full bg-white rounded-xl p-3 sm:p-4 flex items-center justify-between text-black font-bold shadow-lg hover:shadow-xl transition-all text-sm sm:text-base min-w-0"
+        className="w-auto max-w-[280px] bg-blue-400 hover:bg-blue-500 rounded-full px-5 py-3 flex items-center justify-between text-white font-medium shadow-md hover:shadow-lg transition-all text-base min-w-0"
       >
-        <div className="flex items-center gap-3">
-          <span className="text-xl">{selectedGameData?.icon || "🎯"}</span>
-          <span>{selectedGameData?.name || "Select Game"}</span>
+        <div className="flex items-center gap-2">
+          <svg
+            className="w-3.5 h-3.5 text-white flex-shrink-0"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={3}
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+          <span className="text-base text-white">{selectedGameData?.name || "Select The Game"}</span>
         </div>
         <svg
-          className={`w-5 h-5 transition-transform ${isOpen ? "rotate-180" : ""}`}
+          className={`w-3.5 h-3.5 transition-transform flex-shrink-0 ${isOpen ? "rotate-180" : ""}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -77,28 +89,33 @@ export default function GameSelector({ selectedGame, onGameChange }: GameSelecto
       {isOpen && (
         <>
           <div
-            className="fixed inset-0 z-10"
+            className="fixed inset-0 z-[100]"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute z-20 w-full mt-2 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden">
-            {gameTypes.map((game) => (
-              <button
-                key={game.id}
-                onClick={() => {
-                  onGameChange(game.id);
-                  setIsOpen(false);
-                }}
-                className={`w-full p-4 flex items-center gap-3 text-left hover:bg-gray-100 transition-colors ${
-                  selectedGame === game.id ? "bg-blue-50" : ""
-                }`}
-              >
-                <span className="text-xl">{game.icon}</span>
-                <span className="font-medium">{game.name}</span>
-                {selectedGame === game.id && (
-                  <span className="ml-auto text-blue-600">✓</span>
-                )}
-              </button>
-            ))}
+          <div className="absolute z-[101] w-full max-w-xs mt-2 bg-white rounded-lg shadow-xl border border-gray-200 max-h-80 overflow-y-auto">
+            {gameTypes.length === 0 ? (
+              <div className="p-4 text-center text-gray-500">No games available</div>
+            ) : (
+              gameTypes.map((game) => (
+                <button
+                  key={game.id}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onGameChange(game.id);
+                    setIsOpen(false);
+                  }}
+                  className={`w-full p-3 flex items-center gap-3 text-left hover:bg-gray-100 transition-colors ${
+                    selectedGame === game.id ? "bg-blue-50" : ""
+                  }`}
+                >
+                  <span className="text-xl flex-shrink-0">{game.icon}</span>
+                  <span className="font-medium text-sm flex-1 text-left text-black">{game.name}</span>
+                  {selectedGame === game.id && (
+                    <span className="ml-auto text-blue-600 flex-shrink-0">✓</span>
+                  )}
+                </button>
+              ))
+            )}
           </div>
         </>
       )}
