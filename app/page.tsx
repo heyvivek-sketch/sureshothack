@@ -389,10 +389,10 @@ export default function LandingPage() {
                   ? `WAIT ${timer}s` 
                   : "START NOW"}
               </button>
-              {!isVip && (
-                <div className="flex flex-col items-center mt-2 w-full max-w-sm">
+              {/* {!isVip && ( */}
+                {/* <div className="flex flex-col items-center mt-2 w-full max-w-sm"> */}
                   {/* UPI ID with copy button */}
-                  <div className="flex items-center gap-2 mb-3">
+                  {/* <div className="flex items-center gap-2 mb-3">
                     <p className="text-white font-serif text-sm sm:text-xs">Pay here: {upiId}</p>
                     <button
                       onClick={copyUpiId}
@@ -414,13 +414,13 @@ export default function LandingPage() {
                         <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                       </svg>
                     </button>
-                  </div>
+                  </div> */}
                   
                   {/* QR Code */}
-                  <div className="flex flex-col items-center mb-3">
-                    <div className="bg-white p-3 sm:p-1.5 rounded-lg shadow-lg">
+                  {/* <div className="flex flex-col items-center mb-3"> */}
+                    {/* <div className="bg-white p-3 sm:p-1.5 rounded-lg shadow-lg"> */}
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
+                      {/* <img
                         src="/images/image.png"
                         alt="UPI QR Code"
                         className="w-48 h-48 sm:w-36 sm:h-36 object-contain"
@@ -436,11 +436,11 @@ export default function LandingPage() {
                             `;
                           }
                         }}
-                      />
-                    </div>
+                      /> */}
+                    {/* </div> */}
                     
                     {/* Copy and Download QR buttons */}
-                    <div className="flex gap-2 mt-3 sm:mt-1.5">
+                    {/* <div className="flex gap-2 mt-3 sm:mt-1.5">
                       <button
                         onClick={copyQRCode}
                         className="px-4 py-2 sm:px-2.5 sm:py-1 bg-blue-600 hover:bg-blue-700 rounded-lg sm:rounded text-white font-serif text-sm sm:text-xs transition-colors flex items-center gap-2 sm:gap-1"
@@ -482,10 +482,10 @@ export default function LandingPage() {
                         </svg>
                         Download QR
                       </button>
-                    </div>
-                  </div>
-                </div>
-              )}
+                    </div> */}
+                  {/* </div> */}
+               {/*  </div>*/}
+              {/* )} */}
             </div>
 
             {/* Game Result - Show random number icon after game started (VIP only) */}
