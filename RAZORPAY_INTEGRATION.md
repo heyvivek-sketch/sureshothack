@@ -114,7 +114,7 @@ Creates a Razorpay order.
 **Request:**
 ```json
 {
-  "amount": 65500,
+  "amount": 110000,
   "currency": "INR",
   "notes": {}
 }
@@ -126,7 +126,7 @@ Creates a Razorpay order.
   "success": true,
   "order": {
     "id": "order_xxx",
-    "amount": 65500,
+    "amount": 110000,
     "currency": "INR",
     "receipt": "receipt_xxx"
   }
@@ -177,7 +177,7 @@ Authorization: Bearer <jwt_token>
 import { createRazorpayOrder } from '@/lib/utils/razorpay';
 
 const order = await createRazorpayOrder({
-  amount: 65500, // ₹655 in paise
+  amount: 110000, // ₹1100 in paise
   currency: 'INR',
   notes: { userId: 'user_123' },
 });
@@ -202,7 +202,7 @@ import { createRazorpayCheckout, getDefaultRazorpayOptions } from '@/lib/utils/r
 import { apiClient } from '@/lib/api';
 
 // Create order
-const orderResponse = await apiClient.createPaymentOrder(65500, 'INR');
+const orderResponse = await apiClient.createPaymentOrder(110000, 'INR');
 const order = orderResponse.order!;
 
 // Create checkout options
