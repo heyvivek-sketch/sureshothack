@@ -56,7 +56,7 @@ export default function Logo({ size = "md", showText = true }: LogoProps) {
         <>
           <p className="text-white text-xs font-semibold mt-2">SURESHOT HACK</p>
           {size === "md" && (
-            <h1 className="text-4xl font-bold text-white mt-2">SureShot_Hack</h1>
+            <h1 className="text-4xl font-bold text-white mt-2">SureShot Hack</h1>
           )}
         </>
       )}
