@@ -315,7 +315,7 @@ export default function LandingPage() {
       <header className="relative z-10 flex items-center justify-between p-2 sm:p-2.5 md:p-3">
         <Link href="/" className="flex items-center gap-1.5 sm:gap-2">
           <Logo size="sm" showText={false} />
-          <h1 className="text-white text-sm sm:text-lg md:text-xl font-serif font-bold">SureShotHack</h1>
+          <h1 className="text-white text-sm sm:text-lg md:text-xl font-serif font-bold">SureShot Hack</h1>
         </Link>
         <div className="flex gap-1.5 sm:gap-2 items-center">
           {isLoading ? (
