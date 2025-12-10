@@ -3,7 +3,7 @@ import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 
 export const metadata: Metadata = {
-  title: "SureShot_Hack",
+  title: "SureShot Hack",
   description: "SureShot Hack - Gaming Platform",
 };
 
