@@ -66,7 +66,7 @@ export const getDefaultRazorpayOptions = (
     key: getRazorpayKeyId(),
     amount,
     currency,
-    name: 'SureShot_Hack',
+    name: 'SureShot Hack',
     description: 'VIP Subscription - 28 Days',
     order_id: orderId,
     handler,
