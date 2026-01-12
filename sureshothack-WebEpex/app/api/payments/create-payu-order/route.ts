@@ -43,6 +43,13 @@ export async function POST(request: NextRequest) {
       currency: 'INR',
     });
 
+    // Debug: log the generated order and hash (remove in production)
+    try {
+      console.log('Create PayU Order - generated order:', JSON.stringify(order));
+    } catch (err) {
+      console.log('Create PayU Order - unable to stringify order for logging');
+    }
+
     return NextResponse.json({
       success: true,
       order,

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/middleware/auth';
-import { verifyPayUPaymentAndUpdateUser } from '@/lib/services/paymentService';
+import { verifyPaymentAndUpdateUser } from '@/lib/services/paymentService';
 import type { PayUVerifyRequest } from '@/lib/types/payu';
 
 export async function POST(request: NextRequest) {
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       hash,
     };
 
-    const result = await verifyPayUPaymentAndUpdateUser(
+    const result = await verifyPaymentAndUpdateUser(
       authUser.userId,
       paymentData
     );

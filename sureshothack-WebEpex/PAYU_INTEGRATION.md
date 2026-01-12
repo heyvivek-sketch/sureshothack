@@ -64,8 +64,8 @@ NEXT_PUBLIC_PAYU_MERCHANT_KEY="Your PayU Merchant Key"
 
 ### Payment Service (`lib/services/paymentService.ts`)
 
-- **`verifyPaymentAndUpdateUser()`**: Verifies Razorpay payments (legacy)
-- **`verifyPayUPaymentAndUpdateUser()`**: Verifies PayU payments and updates user VIP status
+- **`verifyPaymentAndUpdateUser()`**: Verifies PayU payments and updates user VIP status
+- **`validatePaymentRequest()`**: Validates payment request
 
 ## 🔄 Payment Flow
 

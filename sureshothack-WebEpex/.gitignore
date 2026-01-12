@@ -35,6 +35,8 @@ yarn-error.log*
 next-env.d.ts
 
 # prisma
-prisma/migrations/*
+# Allow migration files and lock file to be committed
+!prisma/migrations/**/*.sql
+!prisma/migrations/migration_lock.toml
 !prisma/migrations/.gitkeep
 

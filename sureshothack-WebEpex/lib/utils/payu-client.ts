@@ -35,15 +35,10 @@ export const isPayULoaded = (): boolean => {
  * Create and submit PayU form
  * @param options PayU checkout options
  */
-export const submitPayUForm = (options: PayUCheckoutOptions): void => {
+export const submitPayUForm = async (options: PayUCheckoutOptions, debug = false): Promise<void> => {
   if (!isPayULoaded()) {
     throw new Error('PayU environment is not ready. Please try again.');
   }
-
-  const form = document.createElement('form');
-  form.method = 'POST';
-  form.action = 'https://secure.payu.in/_payment';
-  form.target = '_blank';
 
   const fields = {
     key: options.key,
@@ -65,12 +60,50 @@ export const submitPayUForm = (options: PayUCheckoutOptions): void => {
     ...(options.udf5 && { udf5: options.udf5 }),
   };
 
+  // Debug: log form fields to browser console before submission
+  try {
+    // eslint-disable-next-line no-console
+    console.log('PayU Form Fields:', JSON.parse(JSON.stringify(fields)));
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.log('PayU Form Fields (unable to stringify)');
+  }
+
+  // If debug is enabled, POST the exact payload to the server debug endpoint
+  if (debug) {
+    try {
+      const debugUrl = `${window.location.origin}/api/payments/debug-payu`;
+      // POST a copy of fields to debug endpoint
+      const resp = await fetch(debugUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(fields),
+      });
+      try {
+        const json = await resp.json();
+        // eslint-disable-next-line no-console
+        console.log('PayU debug endpoint response:', json);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.log('PayU debug endpoint returned non-JSON response');
+      }
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn('Failed to POST to PayU debug endpoint', e);
+    }
+  }
+
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = 'https://secure.payu.in/_payment';
+  form.target = '_blank';
+
   for (const [key, value] of Object.entries(fields)) {
     if (value !== undefined && value !== null) {
       const input = document.createElement('input');
       input.type = 'hidden';
       input.name = key;
-      input.value = value;
+      input.value = value as string;
       form.appendChild(input);
     }
   }
@@ -89,8 +122,8 @@ export const getDefaultPayUOptions = (
   user?: { fullName?: string; email?: string; phone?: string }
 ): PayUCheckoutOptions => {
   const surl = process.env.NEXT_PUBLIC_API_URL
-    ? `${process.env.NEXT_PUBLIC_API_URL}/api/payments/verify`
-    : `${process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000'}/api/payments/verify`;
+    ? `${process.env.NEXT_PUBLIC_API_URL}/api/payments/verify-payu`
+    : `${process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000'}/api/payments/verify-payu`;
 
   const furl = process.env.NEXT_PUBLIC_API_URL
     ? `${process.env.NEXT_PUBLIC_API_URL}/api/payments/failure`

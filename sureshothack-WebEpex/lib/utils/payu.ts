@@ -62,8 +62,10 @@ export const getPayUPublicKey = (): string => {
 
 /**
  * Generate PayU hash for order creation
+ * PayU Standard Hash Formula: sha512(salt|key|txnid|amount|productinfo|firstname|email)
+ * 
  * @param txnid Transaction ID
- * @param amount Amount in rupees
+ * @param amount Amount in rupees (as string, no decimals)
  * @param productinfo Product information
  * @param firstname Customer first name
  * @param email Customer email
@@ -78,8 +80,13 @@ export const generatePayUHash = (
   email: string,
   salt: string
 ): string => {
-  const hashString = `${salt}|${txnid}|${amount}|${productinfo}|${firstname}|${email}|||||||||||`;
-  return crypto.createHash('sha512').update(hashString).digest('hex');
+  const key = getPayUMerchantKey();
+  // PayU formula: salt|key|txnid|amount|productinfo|firstname|email
+  const hashString = `${salt}|${key}|${txnid}|${amount}|${productinfo}|${firstname}|${email}`;
+  console.log('PayU Hash Input String:', hashString);
+  const hash = crypto.createHash('sha512').update(hashString).digest('hex');
+  console.log('PayU Hash SHA512 Output:', hash);
+  return hash;
 };
 
 /**
@@ -98,13 +105,17 @@ export const createPayUOrder = async (
     throw new Error('Invalid amount. Minimum amount is ₹1');
   }
 
-  // Generate unique transaction ID
-  const txnid = `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  // Generate unique transaction ID (alphanumeric only, no special chars)
+  const txnid = `${Date.now()}${Math.random().toString(36).substr(2, 9)}`.substring(0, 20);
+
+  // Format amount as decimal with 2 places (PayU requirement)
+  const formattedAmount = Number(options.amount).toFixed(2);
+  console.log('Formatted Amount for PayU:', formattedAmount);
 
   // Generate hash
   const hash = generatePayUHash(
     txnid,
-    options.amount.toString(),
+    formattedAmount,
     options.productinfo || 'VIP Subscription - 30 Days',
     options.firstname,
     options.email,
@@ -112,8 +123,8 @@ export const createPayUOrder = async (
   );
 
   const successUrl = process.env.NEXT_PUBLIC_API_URL 
-    ? `${process.env.NEXT_PUBLIC_API_URL}/api/payments/verify`
-    : `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'}/api/payments/verify`;
+    ? `${process.env.NEXT_PUBLIC_API_URL}/api/payments/verify-payu`
+    : `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'}/api/payments/verify-payu`;
 
   const failureUrl = process.env.NEXT_PUBLIC_API_URL 
     ? `${process.env.NEXT_PUBLIC_API_URL}/api/payments/failure`
@@ -142,6 +153,9 @@ export const createPayUOrder = async (
 
 /**
  * Verify PayU payment signature
+ * PayU verification hash formula: sha512(salt|status|udf5|udf4|udf3|udf2|udf1|email|firstname|productinfo|amount|txnid|key)
+ * For basic verification: sha512(salt|status|email|firstname|productinfo|amount|txnid|key)
+ * 
  * @param request Payment verification request
  * @param salt Merchant salt
  * @returns True if signature is valid, false otherwise
@@ -156,9 +170,14 @@ export const verifyPayUSignature = (
     return false;
   }
 
-  // Generate expected hash: salt|status|udf5|udf4|udf3|udf2|udf1|email|firstname|productinfo|amount|txnid|key
-  const hashString = `${salt}|${status}||||${email}|${firstname}|${productinfo}|${amount}|${txnid}|${getPayUMerchantKey()}`;
+  const key = getPayUMerchantKey();
+  
+  // PayU verification formula: salt|status|email|firstname|productinfo|amount|txnid|key
+  const hashString = `${salt}|${status}|${email}|${firstname}|${productinfo}|${amount}|${txnid}|${key}`;
+  console.log('PayU Verify Hash Input:', hashString);
   const generatedHash = crypto.createHash('sha512').update(hashString).digest('hex');
+  console.log('PayU Verify Hash Generated:', generatedHash);
+  console.log('PayU Verify Hash Received:', hash);
 
   // Compare hashes using constant-time comparison
   try {
