@@ -5,8 +5,7 @@ import { verifyToken } from '@/lib/utils/jwt';
 async function requireAdmin(request: NextRequest) {
   const auth = request.headers.get('authorization');
   if (!auth?.startsWith('Bearer ')) throw new Error('Unauthorized');
-  const token = auth.slice(7);
-  const payload = verifyToken(token);
+  const payload = verifyToken(auth.slice(7));
   const admin = await prisma.user.findUnique({ where: { id: payload.userId }, select: { id: true, role: true } });
   if (!admin || admin.role !== 'ADMIN') throw new Error('Forbidden');
   return admin;
@@ -38,7 +37,7 @@ export async function PATCH(request: NextRequest) {
     const { userId, isVip, isPremium, role, vipExpiresAt } = body;
     if (!userId) return NextResponse.json({ success: false, message: 'userId is required' }, { status: 400 });
 
-    const data: Record<string, unknown> = {};
+    const data: { isVip?: boolean; isPremium?: boolean; role?: string; vipExpiresAt?: Date | null } = {};
     if (typeof isVip === 'boolean') data.isVip = isVip;
     if (typeof isPremium === 'boolean') data.isPremium = isPremium;
     if (role === 'USER' || role === 'ADMIN') data.role = role;
